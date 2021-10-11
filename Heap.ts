@@ -19,19 +19,20 @@ class HeapNode {
         if (left == null && right == null) {
             return;
         }
-        const direction = HeapifyDirection.Down;
+        let node = right;
         if (left != null && right != null) {
             /* Favor the smallest or largest child node as a swap partner
              * depending on if one is working with a min or max heap.
              * The comparer will return true if the first value meets this
              * criteria. */
-            const node = this.heap.comparer(left.getValue(), right.getValue())
-                ? left
-                : right;
-            this.trySwapValueWith(node, direction);
-            return;
+            if (this.heap.comparer(left.getValue(), right.getValue())) {
+                node = left;
+            }
         }
-        this.trySwapValueWith(left ?? right, direction);
+        else if (left != null) {
+            node = left;
+        }
+        this.trySwapValueWith(node, HeapifyDirection.Down);
     }
     heapifyUp(): void {
         const parent = this.parent();
@@ -53,7 +54,7 @@ class HeapNode {
         return new HeapNode(this.heap, Math.floor(this.index / 2));
     }
     private getHeapNodeAtIndex(idx: number): HeapNode | null {
-        if (idx > this.heap.size + 1) {
+        if (this.heap.isOutOfRange(idx)) {
             return null;
         }
         return new HeapNode(this.heap, idx);
@@ -67,9 +68,8 @@ class HeapNode {
             this.setValue(otherVal);
             otherNode.setValue(val);
             otherNode.heapifyDown();
-            return;
         }
-        if (direction == HeapifyDirection.Up && this.heap.comparer(val, otherVal)) {
+        else if (direction == HeapifyDirection.Up && this.heap.comparer(val, otherVal)) {
             this.setValue(otherVal);
             otherNode.setValue(val);
             otherNode.heapifyUp();
@@ -92,10 +92,13 @@ export class Heap {
             ? (x, y) => x < y
             : (x, y) => x > y;
     }
-    size: number;
+    private size: number;
     readonly storage: number[];
     readonly rootIndex: number;
     readonly comparer: (x: number, y: number) => boolean;
+    isOutOfRange(index: number) : boolean {
+        return index > this.size;
+    }
     peek(): number {
         if (this.size == 0) {
             return NaN;
@@ -103,19 +106,11 @@ export class Heap {
         return this.storage[this.rootIndex];
     }
     store(num: number): void {
-        ++this.size;
+        this.storage[++this.size] = num;
         const settingRoot = this.size == this.rootIndex;
-        if (settingRoot) {
-            this.storage[this.size] = num;
-            return;
+        if (!settingRoot) {
+            new HeapNode(this, this.size).heapifyUp();
         }
-        if (this.storage.length < this.size + 1) {
-            this.storage.push(num);
-        }
-        else {
-            this.storage[this.size] = num;
-        }
-        new HeapNode(this, this.size).heapifyUp();
     }
     take(): number {
         if (this.size == 0) {

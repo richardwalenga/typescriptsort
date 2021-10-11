@@ -15,7 +15,21 @@ function isSorted(nums: number[]): boolean {
     return true;
 }
 
+class SimpleStopWatch {
+    constructor() {
+        this.started = NaN;
+    }
+    private started : number
+    start() : void {
+        this.started = new Date().getTime();
+    }
+    getElapsedMilliseconds() : number {
+        return new Date().getTime() - this.started;
+    }
+}
+
 let nums: number[] = [];
+const watch = new SimpleStopWatch();
 const [numbersToSort, maximumInt] = [20000, 100000];
 for (let i = 0; i < numbersToSort; ++i) {
     nums.push(Math.floor(maximumInt * Math.random()));
@@ -33,9 +47,9 @@ const sorters = [
 
 for (let sorter of sorters) {
     nums = numsBak.slice(0);
-    const begin = new Date().getTime();
+    watch.start();
     sorter.sort(nums);
-    const diff = new Date().getTime() - begin;
+    const diff = watch.getElapsedMilliseconds();
     const sorted = isSorted(nums);
     console.log(`${sorter.name} Sort took ${diff} milliseconds. Nums are sorted: ${sorted}.`);
 }
