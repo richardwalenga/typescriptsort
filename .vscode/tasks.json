@@ -4,6 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "build",
             "type": "typescript",
             "tsconfig": "tsconfig.json",
             "problemMatcher": [
@@ -13,6 +14,14 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "run tests",
+            "type": "shell",
+            "command": ["node"],
+            "args": ["${workspaceFolder}/out/SortTests.js"],
+            "dependsOn":["build"],
+            "problemMatcher": []
         }
     ]
 }
