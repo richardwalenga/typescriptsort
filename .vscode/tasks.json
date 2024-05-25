@@ -16,6 +16,13 @@
             }
         },
         {
+            "label": "install compiler",
+            "type": "shell",
+            "command": ["npm"],
+            "args": ["install", "typescript", "--save-dev"],
+            "problemMatcher": []
+        },
+        {
             "label": "run tests",
             "type": "shell",
             "command": ["node"],
